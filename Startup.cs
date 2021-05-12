@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using MySqlConnector;
 
 namespace server_test
 {
@@ -27,11 +29,19 @@ namespace server_test
         public void ConfigureServices(IServiceCollection services)
         {
 
+            services.AddScoped<IDbConnection>(x => CreateDbConnection());
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "server_test", Version = "v1" });
             });
+        }
+
+        private IDbConnection CreateDbConnection()
+        {
+            string connectionString = Configuration["db:gearhost"];
+            return new MySqlConnection(connectionString);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
